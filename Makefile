@@ -1,4 +1,5 @@
 RASPIOS_IMAGE_NAME=raspios_lite_arm64
+platform32=no
 
 .PHONY: all custom
 

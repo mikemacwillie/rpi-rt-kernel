@@ -2,10 +2,10 @@
 # do not define PLATFORM32 or set it to null if you're building for newer platforms, i.e. Pi 3, Pi 3+, Pi 4, Pi 400, Pi Zero 2 W, Pi CM3, Pi CM3+, Pi CM4
 FROM ubuntu:20.04
 
-ENV LINUX_KERNEL_VERSION=5.15
+ENV LINUX_KERNEL_VERSION=6.3
 ENV LINUX_KERNEL_BRANCH=rpi-${LINUX_KERNEL_VERSION}.y
 
-ENV TZ=Europe/Copenhagen
+ENV TZ=America/Vancouver
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update
@@ -21,7 +21,7 @@ RUN export PATCH=$(curl -s https://mirrors.edge.kernel.org/pub/linux/kernel/proj
     curl https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/${LINUX_KERNEL_VERSION}/${PATCH}.patch.gz --output ${PATCH}.patch.gz && \
     gzip -cd /rpi-kernel/linux/${PATCH}.patch.gz | patch -p1 --verbose
 
-ARG PLATFORM32
+#ARG PLATFORM32
 
 # if PLATFORM32 has been defined then set KERNEL=kernel else set KERNEL=kernel8 (arm64)
 ENV KERNEL=${PLATFORM32:+kernel}
@@ -47,7 +47,7 @@ RUN [ "$ARCH" = "arm" ] && ./scripts/config --enable CONFIG_SMP || true
 RUN [ "$ARCH" = "arm" ] && ./scripts/config --disable CONFIG_BROKEN_ON_SMP || true
 RUN ./scripts/config --set-val CONFIG_RCU_BOOST_DELAY 500
 
-RUN make -j4 Image modules dtbs
+RUN make -j6 Image modules dtbs
 
 ARG RASPIOS_IMAGE_NAME
 RUN echo "Using Raspberry Pi image ${RASPIOS_IMAGE_NAME}"
